@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeteoEarth - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Video Background */
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        /* Container Styles */
+        .container {
+            width: 350px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .container .app-name {
+            color: #4CAF50;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Input Styles */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        /* Button Styles */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Link Styles */
+        .link {
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+            color: #4CAF50;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Styles */
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #fff;
+            font-size: 12px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        /* Date and Time Styles */
+        .datetime {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        /* Error and Success Messages */
+        .error {
+            color: red;
+            text-align: center;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Password visibility toggle styles */
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 28px;  /* Adjusted position to move the icon down by ~0.75 cm */
+            cursor: pointer;
+            color: #4CAF50;
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Video Background -->
+    <video class="video-background" autoplay muted loop>
+        <source src="https://videos.pexels.com/video-files/2711145/2711145-uhd_2560_1440_24fps.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Current Date and Time -->
+    <div class="datetime" id="datetime"></div>
+
+    <!-- Login Page -->
+    <div class="container" id="loginPage">
+        <div class="app-name">MeteoEarth</div>
+        <h2>Login</h2>
+        <form onsubmit="return validateLogin()">
+            <div class="input-group">
+                <label for="login-username">Username:</label>
+                <input type="text" id="login-username" required>
+            </div>
+            <div class="input-group">
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" required>
+                <span class="password-toggle" id="togglePassword"><i class="fas fa-eye-slash"></i></span> <!-- Font Awesome Icon -->
+            </div>
+            <button type="submit">Sign In</button>
+            <p class="link" onclick="showForgetPasswordPage()">Forgot password?</p>
+            <p class="link" onclick="showRegistrationPage()">Create an account</p>
+            <p id="login-error" class="error"></p>
+        </form>
+    </div>
+
+    <!-- Registration Page -->
+    <div class="container hidden" id="registrationPage">
+        <h2>Register</h2>
+        <form onsubmit="return registerAccount()">
+            <div class="input-group">
+                <label for="register-username">Username:</label>
+                <input type="text" id="register-username" required>
+            </div>
+            <div class="input-group">
+                <label for="register-password">Password:</label>
+                <input type="password" id="register-password" required>
+                <span class="password-toggle" id="toggleRegisterPassword"><i class="fas fa-eye-slash"></i></span> <!-- Font Awesome Icon -->
+            </div>
+            <button type="submit">Register</button>
+            <p class="link" onclick="showLoginPage()">Back to Login</p>
+            <p id="register-error" class="error"></p>
+            <p id="register-success" class="success"></p>
+        </form>
+    </div>
+
+    <!-- Forgot Password Page -->
+    <div class="container hidden" id="forgetPasswordPage">
+        <h2>Reset Password</h2>
+        <form onsubmit="return resetPassword()">
+            <div class="input-group">
+                <label for="reset-username">Username:</label>
+                <input type="text" id="reset-username" required>
+            </div>
+            <button type="submit">Reset Password</button>
+            <p class="link" onclick="showLoginPage()">Back to Login</p>
+            <p id="reset-error" class="error"></p>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">Powered by MeteoEarth</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script> <!-- Font Awesome JS -->
+    <script>
+        // Show pages
+        function showLoginPage() {
+            document.getElementById("loginPage").classList.remove("hidden");
+            document.getElementById("registrationPage").classList.add("hidden");
+            document.getElementById("forgetPasswordPage").classList.add("hidden");
+        }
+
+        function showRegistrationPage() {
+            document.getElementById("loginPage").classList.add("hidden");
+            document.getElementById("registrationPage").classList.remove("hidden");
+            document.getElementById("forgetPasswordPage").classList.add("hidden");
+        }
+
+        function showForgetPasswordPage() {
+            document.getElementById("loginPage").classList.add("hidden");
+            document.getElementById("forgetPasswordPage").classList.remove("hidden");
+            document.getElementById("registrationPage").classList.add("hidden");
+        }
+
+        // Redirect to Weather App
+        const redirectToWeatherApp = () => {
+            window.location.href = "consolidated_project.html";
+        };
+
+        // Validate Login
+        function validateLogin() {
+            const username = document.getElementById("login-username").value;
+            const password = document.getElementById("login-password").value;
+
+            if (username === "user" && password === "password123") {
+                redirectToWeatherApp();
+                return false;
+            } else {
+                document.getElementById("login-error").textContent = "Invalid username or password.";
+                return false;
+            }
+        }
+
+        // Register Account
+        function registerAccount() {
+            const username = document.getElementById("register-username").value;
+            const password = document.getElementById("register-password").value;
+
+            if (username && password) {
+                document.getElementById("register-success").textContent = "Account created successfully!";
+                setTimeout(redirectToWeatherApp, 2000);
+                return false;
+            } else {
+                document.getElementById("register-error").textContent = "All fields are required.";
+                return false;
+            }
+        }
+
+        // Reset Password
+        function resetPassword() {
+            const username = document.getElementById("reset-username").value;
+
+            if (username) {
+                alert("Password reset link sent to the registered email.");
+                showLoginPage();
+                return false;
+            } else {
+                document.getElementById("reset-error").textContent = "Username is required.";
+                return false;
+            }
+        }
+
+        // Update Date and Time
+        function updateDatetime() {
+            const datetime = document.getElementById("datetime");
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            datetime.textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        updateDatetime();
+        setInterval(updateDatetime, 60000); // Update every minute
+
+        // Password visibility toggle
+        const toggleLoginPassword = document.getElementById('togglePassword');
+        const loginPasswordInput = document.getElementById('login-password');
+        toggleLoginPassword.addEventListener('click', function () {
+            const type = loginPasswordInput.type === 'password' ? 'text' : 'password';
+            loginPasswordInput.type = type;
+            toggleLoginPassword.innerHTML = type === 'password' ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+        });
+
+        const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+        const registerPasswordInput = document.getElementById('register-password');
+        toggleRegisterPassword.addEventListener('click', function () {
+            const type = registerPasswordInput.type === 'password' ? 'text' : 'password';
+            registerPasswordInput.type = type;
+            toggleRegisterPassword.innerHTML = type === 'password' ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+        });
+    </script>
+</body>
+
+</html>

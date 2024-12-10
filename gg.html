@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .weather-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        .city-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .temperature {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .weather-condition {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .details {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .detail-item {
+            font-size: 1rem;
+        }
+
+        .search-box input {
+            width: 70%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            background-color: #0077b6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .forecast {
+            margin-top: 20px;
+        }
+
+        .forecast .hourly, .forecast .daily {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .forecast .hourly div, .forecast .daily div {
+            font-size: 0.9rem;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .extra-details-container {
+            margin-top: 20px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+
+        .extra-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .extra-details div {
+            font-size: 1rem;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            display: none;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #333;
+            color: white;
+        }
+
+        body.dark-mode .weather-container {
+            background: #444;
+        }
+
+        body.dark-mode .search-box input {
+            background-color: #555;
+            color: white;
+        }
+
+        body.dark-mode .search-box button {
+            background-color: #1f77b4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="weather-container">
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name">
+            <button onclick="getWeather()">Search</button>
+        </div>
+        <div class="city-name" id="cityName">Weather App</div>
+        <div class="temperature" id="temperature">--°C</div>
+        <div class="weather-condition" id="weatherCondition">Enter a city to get started</div>
+        
+        <div class="details">
+            <div class="detail-item" id="humidity">Humidity: --%</div>
+            <div class="detail-item" id="windSpeed">Wind: -- km/h</div>
+        </div>
+
+        <div class="forecast">
+            <div class="hourly">
+                <div>12:00 - 25°C</div>
+                <div>15:00 - 26°C</div>
+                <div>18:00 - 24°C</div>
+            </div>
+            <div class="daily">
+                <div>Mon: 26°C</div>
+                <div>Tue: 25°C</div>
+                <div>Wed: 27°C</div>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage">City not found. Please try again.</div>
+    </div>
+
+    <!-- New Box with Extra Details -->
+    <div class="extra-details-container" id="extraDetailsContainer">
+        <h3>Additional Details</h3>
+        <div class="extra-details">
+            <div id="uvIndex">UV Index: --</div>
+            <div id="airQuality">Air Quality: --</div>
+        </div>
+        <div class="extra-details">
+            <div id="pollenCount">Pollen Count: --</div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+        const cityInput = document.getElementById('cityInput');
+        const cityName = document.getElementById('cityName');
+        const temperature = document.getElementById('temperature');
+        const weatherCondition = document.getElementById('weatherCondition');
+        const humidity = document.getElementById('humidity');
+        const windSpeed = document.getElementById('windSpeed');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Extra Details
+        const uvIndex = document.getElementById('uvIndex');
+        const airQuality = document.getElementById('airQuality');
+        const pollenCount = document.getElementById('pollenCount');
+        const extraDetailsContainer = document.getElementById('extraDetailsContainer');
+
+        async function getWeather() {
+            const city = cityInput.value.trim();
+
+            if (!city) return;
+
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+                
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+
+                const data = await response.json();
+
+                cityName.textContent = `${data.name}, ${data.sys.country}`;
+                temperature.textContent = `${Math.round(data.main.temp)}°C`;
+                weatherCondition.textContent = data.weather[0].description;
+                humidity.textContent = `Humidity: ${data.main.humidity}%`;
+                windSpeed.textContent = `Wind: ${data.wind.speed} km/h`;
+
+                errorMessage.style.display = 'none';
+                showForecast(data.coord.lat, data.coord.lon); // Show forecast
+                showExtraDetails(data.coord.lat, data.coord.lon); // Show extra details
+            } catch (err) {
+                errorMessage.style.display = 'block';
+                cityName.textContent = 'Weather App';
+                temperature.textContent = '--°C';
+                weatherCondition.textContent = 'Enter a city to get started';
+                humidity.textContent = 'Humidity: --%';
+                windSpeed.textContent = 'Wind: -- km/h';
+                extraDetailsContainer.style.display = 'none';
+            }
+        }
+
+        async function showForecast(lat, lon) {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,alerts&units=metric&appid=${apiKey}`);
+                const data = await response.json();
+
+                // Hourly Forecast
+                let hourlyHtml = '';
+                data.hourly.slice(0, 3).forEach(hour => {
+                    hourlyHtml += `<div>${new Date(hour.dt * 1000).getHours()}:00 - ${Math.round(hour.temp)}°C</div>`;
+                });
+                document.querySelector('.forecast .hourly').innerHTML = hourlyHtml;
+
+                // Daily Forecast
+                let dailyHtml = '';
+                data.daily.slice(0, 3).forEach(day => {
+                    dailyHtml += `<div>${new Date(day.dt * 1000).toLocaleDateString()} - ${Math.round(day.temp.day)}°C</div>`;
+                });
+                document.querySelector('.forecast .daily').innerHTML = dailyHtml;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function showExtraDetails(lat, lon) {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,daily&appid=${apiKey}`);
+                const data = await response.json();
+
+                // UV Index
+                uvIndex.textContent = `UV Index: ${data.current.uvi}`;
+
+                // Air Quality (if available)
+                airQuality.textContent = `Air Quality: ${data.current.air_quality ? data.current.air_quality : 'Data not available'}`;
+
+                // Pollen Count (optional: might require another service)
+                pollenCount.textContent = `Pollen Count: Not Available`; // For now, placeholder
+
+                extraDetailsContainer.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                extraDetailsContainer.style.display = 'none';
+            }
+        }
+
+        // Allow search when pressing Enter key
+        cityInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getWeather();
+            }
+        });
+    </script>
+</body>
+</html>
